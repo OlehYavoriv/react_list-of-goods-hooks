@@ -15,24 +15,24 @@ export const goodsFromServer = [
   'Garlic',
 ];
 
-const SORT_FIELD_ALPHABETICALLY = 'alphabetically';
-const SORT_FIELD_LENGTH = 'length';
+enum SortField {
+  ALPHABETICALLY = 'alphabetically',
+  LENGTH = 'length',
+}
 
 function getPreparedFoods(
   goods: string[],
-  sortField: string,
+  sortField: SortField | null,
   isReversed: boolean,
 ) {
   const initialGoods = [...goods];
 
   switch (sortField) {
-    case SORT_FIELD_ALPHABETICALLY:
+    case SortField.ALPHABETICALLY:
       initialGoods.sort((a, b) => a.localeCompare(b));
       break;
-    case SORT_FIELD_LENGTH:
+    case SortField.LENGTH:
       initialGoods.sort((a, b) => a.length - b.length);
-      break;
-    default:
       break;
   }
 
@@ -44,7 +44,7 @@ function getPreparedFoods(
 }
 
 export const App: React.FC = () => {
-  const [sortField, setSortField] = useState('');
+  const [sortField, setSortField] = useState<SortField | null>(null);
   const [isReversed, setIsReversed] = useState(false);
   const visibleGoods: string[] = getPreparedFoods(
     goodsFromServer,
@@ -57,16 +57,16 @@ export const App: React.FC = () => {
       <div className="buttons">
         <button
           type="button"
-          className={`button is-info${sortField === SORT_FIELD_ALPHABETICALLY ? '' : ' is-light'}`}
-          onClick={() => setSortField(SORT_FIELD_ALPHABETICALLY)}
+          className={`button is-info${sortField === SortField.ALPHABETICALLY ? '' : ' is-light'}`}
+          onClick={() => setSortField(SortField.ALPHABETICALLY)}
         >
           Sort alphabetically
         </button>
 
         <button
           type="button"
-          className={`button is-success${sortField === SORT_FIELD_LENGTH ? '' : ' is-light'}`}
-          onClick={() => setSortField(SORT_FIELD_LENGTH)}
+          className={`button is-success${sortField === SortField.LENGTH ? '' : ' is-light'}`}
+          onClick={() => setSortField(SortField.LENGTH)}
         >
           Sort by length
         </button>
@@ -79,15 +79,12 @@ export const App: React.FC = () => {
           Reverse
         </button>
 
-        {sortField === '' && isReversed === false ? (
-          // eslint-disable-next-line react/jsx-no-useless-fragment
-          <></>
-        ) : (
+        {(sortField !== null || isReversed) && (
           <button
             type="button"
             className="button is-danger is-light"
             onClick={() => {
-              setSortField('');
+              setSortField(null);
               setIsReversed(false);
             }}
           >
